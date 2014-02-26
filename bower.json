@@ -1,0 +1,21 @@
+{
+  "name": "kill_them",
+  "version": "0.0.0",
+  "homepage": "https://github.com/vyorkin/kill_them",
+  "authors": [
+    "Vasiliy Yorkin <vasiliy.yorkin@gmail.com>",
+    "Alex Klyanchin <jetblackmeerkat@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "pixi": "~1.5.1",
+    "requirejs": "~2.1.11"
+  }
+}
