@@ -26,7 +26,6 @@ gulp.task 'lint', ->
 gulp.task 'libjs', ->
   gulp.src paths.scripts.lib
     .pipe plugins.changed('build/js', { extension: '.js' })
-    #.pipe plugins.uglify({ outSourceMap: true })
     .pipe plugins.uglify()
     .pipe plugins.concat('lib.min.js')
     .pipe plugins.size({ showFiles: true })
@@ -39,7 +38,6 @@ gulp.task 'appjs', ->
   gulp.src paths.scripts.app
     .pipe plugins.changed('build/js', { extension: '.js' })
     .pipe plugins.coffee()
-    #.pipe plugins.uglify({ outSourceMap: true })
     .pipe plugins.uglify()
     .pipe plugins.concat('app.min.js')
     .pipe plugins.size({ showFiles: true })

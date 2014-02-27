@@ -1,5 +1,5 @@
-stage = new PIXI.Stage(0x66FF99)
-renderer = PIXI.autoDetectRenderer(400, 300)
+stage = new PIXI.Stage(0x000000)
+renderer = PIXI.autoDetectRenderer(800, 600)
 document.body.appendChild(renderer.view)
 
 texture = PIXI.Texture.fromImage("img/bunny.png")
