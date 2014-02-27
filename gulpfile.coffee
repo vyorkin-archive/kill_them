@@ -1,32 +1,94 @@
-gulp = require 'gulp'
-
-coffee   = require 'gulp-coffee'
-concat   = require 'gulp-concat'
-uglify   = require 'gulp-uglify'
-imagemin = require 'gulp-imagemin'
+gulp    = require 'gulp'
+plugins = require('gulp-load-plugins')()
 
 paths = {
-  scripts: ['scripts/**/*.coffee', 'scripts/**/*.js'],
-  images: 'images/**/*'
+  scripts: {
+    lib: [
+      'bower_components/requirejs/require.js',
+      'bower_components/pixi/bin/pixi.js'
+    ],
+    app: ['scripts/**/*.coffee']
+  },
+  styles: {
+    app: ['styles/**/*.scss']
+  },
+  images: 'images/**/*',
+  pages: '*.haml'
 }
 
-gulp.task('scripts', ->
-  gulp.src paths.scripts
-    .pipe coffee()
-    .pipe uglify()
-    .pipe concat('all.min.js')
+gulp.task 'lint', ->
+  gulp.src paths.scripts.app
+    .pipe plugins.cached 'lint'
+    .pipe plugins.coffeelint()
+    .pipe plugins.coffeelint.reporter()
+    .pipe plugins.notify 'coffeescript lint complete'
+
+gulp.task 'libjs', ->
+  gulp.src paths.scripts.lib
+    .pipe plugins.changed('build/js', { extension: '.js' })
+    .pipe plugins.uglify({ outSourceMap: true })
+    .pipe plugins.concat('lib.min.js')
+    .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/js')
-)
+    .pipe plugins.notify 'library scripts build complete'
 
-gulp.task('images', ->
- gulp.src paths.images
-    .pipe imagemin({ optimizationLevel: 5 })
+gulp.task 'minify', ['styles', 'libjs', 'appjs']
+
+gulp.task 'todo', ->
+  gulp.src paths.scripts.app
+    .pipe plugins.changed('build/js', { extensions: '.js' })
+    .pipe plugins.coffee()
+    .pipe plugins.todo()
+    .pipe gulp.dest('./')
+    .pipe plugins.notify 'todo extraction complete'
+
+gulp.task 'appjs', ->
+  gulp.src paths.scripts.app
+    .pipe plugins.changed('build/js', { extension: '.js' })
+    .pipe plugins.coffee()
+    .pipe plugins.uglify({ outSourceMap: true })
+    .pipe plugins.concat('app.min.js')
+    .pipe plugins.size({ showFiles: true })
+    .pipe gulp.dest('build/js')
+    .pipe plugins.notify 'application scripts build complete'
+
+gulp.task 'styles', ->
+  gulp.src paths.styles.app
+    .pipe plugins.changed('build/css', { extension: '.css' })
+    .pipe plugins.rubySass({ sourcemap: true })
+    .pipe plugins.size({ showFiles: true })
+    .pipe gulp.dest('build/css')
+    .pipe plugins.notify 'scss to css conversion complete'
+
+gulp.task 'images', ->
+  gulp.src paths.images
+    .pipe plugins.cached('images')
+    .pipe plugins.imagemin({
+      optimizationLevel: 5,
+      progressive: true,
+      interlaced: true
+    })
     .pipe gulp.dest('build/img')
-)
+    .pipe plugins.notify 'image optimization complete'
 
-gulp.task('watch', ->
-  gulp.watch paths.scripts, ['scripts']
+gulp.task 'pages', ->
+  gulp.src paths.pages
+    .pipe plugins.cached('pages')
+    .pipe plugins.changed('build/', { extension: '.html' })
+    .pipe plugins.rubyHaml()
+    .pipe plugins.minifyHtml()
+    .pipe gulp.dest('build/')
+    .pipe plugins.notify 'haml to html conversion complete'
+
+gulp.task 'clean', ->
+  gulp.src ['build/*.html', 'build/css/*.css', 'build/js/*.js']
+    .pipe plugins.clean()
+
+gulp.task 'watch', ->
+  gulp.watch paths.scripts.app, ['lint', 'appjs', 'todo']
+  gulp.watch paths.scripts.lib, ['libjs']
+  gulp.watch paths.styles.app, ['styles']
   gulp.watch paths.images, ['images']
-)
+  gulp.watch paths.pages, ['pages']
 
-gulp.task 'default', ['scripts', 'images', 'watch']
+gulp.task 'default', ['lint', 'minify', 'images', 'pages', 'todo', 'watch']
