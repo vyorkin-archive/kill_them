@@ -6,6 +6,7 @@ kill_them
 Prerequisites
 ---------
 * `gem install --pre sass`
+* `npm install -g http-server bower testem coffeegulp`
 * `npm install`
 * `bower install`
 
