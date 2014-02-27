@@ -34,14 +34,6 @@ gulp.task 'libjs', ->
 
 gulp.task 'minify', ['styles', 'libjs', 'appjs']
 
-gulp.task 'todo', ->
-  gulp.src paths.scripts.app
-    .pipe plugins.changed('build/js', { extensions: '.js' })
-    .pipe plugins.coffee()
-    .pipe plugins.todo()
-    .pipe gulp.dest('./')
-    .pipe plugins.notify 'todo extraction complete'
-
 gulp.task 'appjs', ->
   gulp.src paths.scripts.app
     .pipe plugins.changed('build/js', { extension: '.js' })
@@ -55,7 +47,7 @@ gulp.task 'appjs', ->
 gulp.task 'styles', ->
   gulp.src paths.styles.app
     .pipe plugins.changed('build/css', { extension: '.css' })
-    .pipe plugins.rubySass({ sourcemap: true })
+    .pipe plugins.rubySass()
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/css')
     .pipe plugins.notify 'scss to css conversion complete'
@@ -85,10 +77,10 @@ gulp.task 'clean', ->
     .pipe plugins.clean()
 
 gulp.task 'watch', ->
-  gulp.watch paths.scripts.app, ['lint', 'appjs', 'todo']
+  gulp.watch paths.scripts.app, ['lint', 'appjs']
   gulp.watch paths.scripts.lib, ['libjs']
   gulp.watch paths.styles.app, ['styles']
   gulp.watch paths.images, ['images']
   gulp.watch paths.pages, ['pages']
 
-gulp.task 'default', ['lint', 'minify', 'images', 'pages', 'todo', 'watch']
+gulp.task 'default', ['lint', 'minify', 'images', 'pages', 'watch']

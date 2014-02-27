@@ -2,3 +2,4 @@ node_modules
 build
 .grunt
 bower_components
+.sass-cache
