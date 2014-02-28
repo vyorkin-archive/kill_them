@@ -38,7 +38,7 @@ gulp.task 'appjs', ->
   gulp.src paths.scripts.app
     .pipe plugins.changed('build/js', { extension: '.js' })
     .pipe plugins.coffee()
-    .pipe plugins.uglify()
+    # .pipe plugins.uglify()
     .pipe plugins.concat('app.min.js')
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/js')
