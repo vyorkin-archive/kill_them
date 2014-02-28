@@ -12,7 +12,7 @@ paths = {
   styles: {
     app: ['styles/**/*.scss']
   },
-  images: 'images/**/*',
+  assets: 'assets/**/*.*',
   pages: 'pages/*.haml'
 }
 
@@ -44,6 +44,11 @@ gulp.task 'appjs', ->
     .pipe gulp.dest('build/js')
     .pipe plugins.notify 'application scripts build complete'
 
+gulp.task 'assets', ->
+  gulp.src paths.assets
+    .pipe gulp.dest('build/assets')
+    .pipe plugins.notify 'assets build complete'
+
 gulp.task 'styles', ->
   gulp.src paths.styles.app
     .pipe plugins.changed('build/css', { extension: '.css' })
@@ -51,17 +56,6 @@ gulp.task 'styles', ->
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/css')
     .pipe plugins.notify 'scss to css conversion complete'
-
-gulp.task 'images', ->
-  gulp.src paths.images
-    .pipe plugins.cached('images')
-    .pipe plugins.imagemin({
-      optimizationLevel: 5,
-      progressive: true,
-      interlaced: true
-    })
-    .pipe gulp.dest('build/img')
-    .pipe plugins.notify 'image optimization complete'
 
 gulp.task 'pages', ->
   gulp.src paths.pages
@@ -80,7 +74,9 @@ gulp.task 'watch', ->
   gulp.watch paths.scripts.app, ['lint', 'appjs']
   gulp.watch paths.scripts.lib, ['libjs']
   gulp.watch paths.styles.app, ['styles']
-  gulp.watch paths.images, ['images']
+  gulp.watch paths.assets, ['assets']
   gulp.watch paths.pages, ['pages']
 
-gulp.task 'default', ['lint', 'minify', 'images', 'pages', 'watch']
+# TODO: Add task to build texture atlases
+
+gulp.task 'default', ['lint', 'minify', 'pages', 'assets', 'watch']
