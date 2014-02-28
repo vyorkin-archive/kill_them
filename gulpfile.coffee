@@ -5,7 +5,7 @@ paths = {
   scripts: {
     lib: [
       #'bower_components/requirejs/require.js',
-      'bower_components/pixi/bin/pixi.js'
+      'bower_components/phaser/phaser.min.js'
     ],
     app: ['scripts/**/*.coffee']
   },
