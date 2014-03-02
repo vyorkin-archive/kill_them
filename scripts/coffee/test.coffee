@@ -1,10 +1,11 @@
 game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
+
   preload: ->
     @load.tilemap('level', 'assets/tilemaps/maps/map1.json',
       null, Phaser.Tilemap.TILED_JSON)
 
     @load.image('tiles', 'assets/tilemaps/tiles/grass-tiles-2-small.png')
-    @load.image('hero', 'assets/images/hero.png')
+    @load.image('player', 'assets/images/player.png')
 
   create: ->
     @map = @add.tilemap('level')
@@ -12,7 +13,9 @@ game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
 
     @layer = @map.createLayer('background')
     @layer.resizeWorld()
-    @sprite = @add.sprite(200, 200, 'hero')
+    @sprite = @add.sprite(200, 200, 'player')
+    @sprite.anchor.x = 0.5
+    @sprite.anchor.y = 0.5
 
     @camera.follow(@sprite)
 
@@ -31,6 +34,6 @@ game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
       @sprite.body.angularVelocity = 200
 
     if @cursors.up.isDown
-      vel = @physics.velocityFromAngle(@sprite.angle, 300)
+      vel = @physics.velocityFromAngle(@sprite.angle, 200)
       @sprite.body.velocity.copyFrom(vel)
 })
