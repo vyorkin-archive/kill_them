@@ -6,14 +6,9 @@ class CarbonBased
     @sprite.anchor.y = 0.5
     @sprite.body.collideWorldBounds = true
     @sprite.angle = @game.rnd.angle()
+    @sprite.body.linearDamping = 0.2
     @sprite.body.bounce.setTo(1, 1)
-    @sprite.body.maxVelocity.setTo(200 * @speed, 200 * @speed)
-
-  hit: ->
-    @health -= 1
-    @alive = false if @health <= 0
-
-  update: ->
+    @sprite.body.maxVelocity.setTo(0, 0)
 
 class Zombie extends CarbonBased
   constructor: (@game, @player) ->
@@ -21,17 +16,23 @@ class Zombie extends CarbonBased
     @speed = 2
     super @game, 'zombie' + @game.rnd.integerInRange(1, 4)
 
+  hit: ->
+    @health -= 1
+    @alive = false if @health <= 0
+
   update: ->
     @sprite.rotation = @game.physics.angleBetween(@sprite, @player.sprite)
+    @game.physics.moveToObject(@sprite, @player.sprite, @speed * 10, 0)
+    @sprite.kill if !@alive
 
 class Player extends CarbonBased
   constructor: (options) ->
-    {@game, @layer, @cursors} = options
+    {@game, @layer, @cursors, @bullets} = options
     @health = 50
     @speed = 200
+    @fireRate = 100
+    @nextFire = 0
     super @game, 'player'
-
-  fire: -> console.log 'firing!'
 
   update: ->
     @game.physics.collide(@sprite, @layer)
@@ -45,13 +46,22 @@ class Player extends CarbonBased
     else if @cursors.right.isDown
       @sprite.body.angularVelocity += @speed
 
-    # targeting & firing based on cursor position (like it was in alienshooter)
-    # @sprite.rotation = @game.physics.angleToPointer(@sprite)
-    # @fire if @game.input.activePointer.isDown
-
     if @cursors.up.isDown
-      vel = @game.physics.velocityFromAngle(@sprite.angle, 200)
+      vel = @game.physics.velocityFromAngle(@sprite.angle, @speed)
       @sprite.body.velocity.copyFrom(vel)
+
+    if @cursors.down.isDown
+      vel = @game.physics.velocityFromAngle(@sprite.angle, -@speed)
+      @sprite.body.velocity.copyFrom(vel)
+
+    if @game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)
+      if @game.time.now > @nextFire && @bullets.countDead() > 0
+        @nextFire = @game.time.now + @fireRate
+
+        bullet = @bullets.getFirstDead()
+        bullet.reset(@sprite.x, @sprite.y)
+        @game.physics.velocityFromAngle(@sprite.angle,
+          1000, bullet.body.velocity)
 
 game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
   preload: ->
@@ -74,6 +84,14 @@ game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
       @load.image(alias, path)
 
   create: ->
+    # TODO: try it
+    # @stage.fullScreenScaleMode = Phaser.StageScaleMode.SHOW_ALL
+    # @input.keyboard.addCallbacks(
+    #   Phaser.Keyboard.F1,
+    #   => @stage.scale.startFullScreen(),
+    #   null
+    # )
+
     @map = @add.tilemap('level')
     @map.addTilesetImage('grass-tiles-2-small', 'tiles')
 
@@ -91,7 +109,8 @@ game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
     @player = new Player(
       game: @game,
       layer: @layer,
-      cursors: @cursors
+      cursors: @cursors,
+      bullets: @bullets
     )
 
     @zombies = []
@@ -99,11 +118,20 @@ game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
 
     @camera.follow(@player.sprite)
 
-    # TODO: try it
-    # @camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
-    # @camera.focusOnXY(0, 0);
+    @camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)
+    @camera.focusOnXY(0, 0)
+
+    @zombieHit = (z, b) ->
+      @hit()
+      b.kill()
 
   update: ->
     @player.update()
-    zombie.update() for zombie in @zombies
+
+    for zombie in @zombies
+      if zombie.alive
+        zombie.update()
+        @physics.collide(@player.sprite, zombie.sprite)
+        @physics.overlap(@bullets, zombie.sprite, @zombieHit, null, zombie)
+
 })
