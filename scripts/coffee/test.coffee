@@ -6,7 +6,7 @@ class CarbonBased
     @sprite.anchor.y = 0.5
     @sprite.body.collideWorldBounds = true
     @sprite.angle = @game.rnd.angle()
-    @sprite.body.linearDamping = 0.2
+    @sprite.body.linearDamping = 0.1
     @sprite.body.bounce.setTo(1, 1)
     @sprite.body.maxVelocity.setTo(0, 0)
 
@@ -114,7 +114,7 @@ game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
     )
 
     @zombies = []
-    @zombies.push(new Zombie(@game, @player)) for [1..5]
+    @zombies.push(new Zombie(@game, @player)) for [1..200]
 
     @camera.follow(@player.sprite)
 
