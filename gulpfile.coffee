@@ -4,7 +4,7 @@ plugins = require('gulp-load-plugins')()
 paths = {
   scripts: {
     lib: [
-      #'bower_components/requirejs/require.js',
+      'bower_components/requirejs/require.js',
       'bower_components/phaser/phaser.min.js'
     ],
     app: ['scripts/**/*.coffee']
@@ -26,8 +26,8 @@ gulp.task 'lint', ->
 gulp.task 'libjs', ->
   gulp.src paths.scripts.lib
     .pipe plugins.changed('build/js', { extension: '.js' })
-    .pipe plugins.uglify()
-    .pipe plugins.concat('lib.min.js')
+    # .pipe plugins.uglify()
+    # .pipe plugins.concat('lib.min.js')
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/js')
     .pipe plugins.notify 'library scripts build complete'
@@ -39,7 +39,7 @@ gulp.task 'appjs', ->
     .pipe plugins.changed('build/js', { extension: '.js' })
     .pipe plugins.coffee()
     # .pipe plugins.uglify()
-    .pipe plugins.concat('app.min.js')
+    # .pipe plugins.concat('app.min.js')
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/js')
     .pipe plugins.notify 'application scripts build complete'
