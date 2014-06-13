@@ -26,20 +26,18 @@ gulp.task 'lint', ->
 gulp.task 'libjs', ->
   gulp.src paths.scripts.lib
     .pipe plugins.changed('build/js', { extension: '.js' })
-    # .pipe plugins.uglify()
-    # .pipe plugins.concat('lib.min.js')
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/js')
     .pipe plugins.notify 'library scripts build complete'
 
-gulp.task 'minify', ['styles', 'libjs', 'appjs']
+gulp.task 'build', ['styles', 'libjs', 'appjs']
 
 gulp.task 'appjs', ->
   gulp.src paths.scripts.app
     .pipe plugins.changed('build/js', { extension: '.js' })
+    .pipe plugins.sourcemaps.init()
     .pipe plugins.coffee()
-    # .pipe plugins.uglify()
-    # .pipe plugins.concat('app.min.js')
+    .pipe plugins.sourcemaps.write('maps')
     .pipe plugins.size({ showFiles: true })
     .pipe gulp.dest('build/js')
     .pipe plugins.notify 'application scripts build complete'
@@ -51,6 +49,7 @@ gulp.task 'assets', ->
 
 gulp.task 'styles', ->
   gulp.src paths.styles.app
+    .pipe plugins.flatten()
     .pipe plugins.changed('build/css', { extension: '.css' })
     .pipe plugins.rubySass()
     .pipe plugins.size({ showFiles: true })
@@ -66,8 +65,13 @@ gulp.task 'pages', ->
     .pipe gulp.dest('build/')
     .pipe plugins.notify 'haml to html conversion complete'
 
+
 gulp.task 'clean', ->
-  gulp.src ['build/*.html', 'build/css/*.css', 'build/js/*.js']
+  gulp.src [
+    'build/*.html', 'build/css/*.css',
+    'build/js/*.js', 'build/js/maps/*.map',
+    'build/assets/**/*.*'
+  ]
     .pipe plugins.clean()
 
 gulp.task 'watch', ->
@@ -77,6 +81,4 @@ gulp.task 'watch', ->
   gulp.watch paths.assets, ['assets']
   gulp.watch paths.pages, ['pages']
 
-# TODO: Add task to build texture atlases
-
-gulp.task 'default', ['lint', 'minify', 'pages', 'assets', 'watch']
+gulp.task 'default', ['lint', 'build', 'pages', 'assets', 'watch']

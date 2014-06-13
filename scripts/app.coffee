@@ -24,14 +24,6 @@ define ['phaser.min', 'entities', 'components', 'systems'], (Ph, E, C, S) ->
         @load.image(alias, path)
 
     create: ->
-      # TODO: try it
-      # @stage.fullScreenScaleMode = Phaser.StageScaleMode.SHOW_ALL
-      # @input.keyboard.addCallbacks(
-      #   Phaser.Keyboard.F1,
-      #   => @stage.scale.startFullScreen(),
-      #   null
-      # )
-
       @map = @add.tilemap('level')
       @map.addTilesetImage('grass-tiles-2-small', 'tiles')
 
