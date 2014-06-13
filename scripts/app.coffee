@@ -1,4 +1,8 @@
 define ['phaser.min', 'entities', 'components', 'systems'], (Ph, E, C, S) ->
+  window.E = E
+  window.C = C
+  window.S = S
+
   game = new Ph.Game(800, 600, Ph.AUTO, 'phaser-example', {
     preload: ->
       sprites =
